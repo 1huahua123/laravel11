@@ -1,8 +1,8 @@
 <?php
 /**
  * @file innopacks/common/config/innoshop.php
- * @brief Innoshop配置文件
  * @author 华锐
+ * @desc Innoshop配置文件
  */
 return [
     'edition' => 'community', // community: 社区版, enterprise: 企业版
