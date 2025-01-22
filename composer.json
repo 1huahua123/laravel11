@@ -23,8 +23,12 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
-        }
+            "Database\\Seeders\\": "database/seeders/",
+            "InnoShop\\Common\\": "innopacks/common/src"
+        },
+        "files": [
+            "innopacks/common/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
