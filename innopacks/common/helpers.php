@@ -5,6 +5,19 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use InnoShop\Common\Repositories\SettingRepo;
 
+if (!function_exists('inno_path')) {
+    /**
+     * 获取InnoShop路径
+     *
+     * @param string $path
+     * @return string
+     */
+    function inno_path(string $path): string
+    {
+        return base_path("innopacks/{$path}");
+    }
+}
+
 if (!function_exists('load_settings')) {
     /**
      * 加载设置
