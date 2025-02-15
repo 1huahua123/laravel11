@@ -19,7 +19,7 @@ if (!function_exists('front_trans')) {
      * @param string|null $locale  指定语言环境，如果不提供则使用当前语言环境
      * @return string|array        返回翻译后的字符串或数组
      */
-    function front_trans(string $key = null, array $replace = [], string $locale = null)
+    function front_trans(?string $key = null, array $replace = [], ?string $locale = null): array|string
     {
         // 调用Laravel的trans函数，指定语言包的命名空间为 'front'，并传递键名、替换数组和语言环境
         return trans('front/' . $key, $replace, $locale);
