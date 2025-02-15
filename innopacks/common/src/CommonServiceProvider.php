@@ -22,6 +22,24 @@ class CommonServiceProvider extends ServiceProvider
     public function boot(): void
     {
         load_settings();
+        $this->registerConfig();
+    }
+
+    /**
+     * 注册配置文件
+     *
+     * @return void
+     */
+    private function registerConfig(): void
+    {
+        $this->mergeConfigFrom($this->basePath . 'config/innoshop.php', 'innoshop');
+    }
+
+    private function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands();
+        }
     }
 
     /**
