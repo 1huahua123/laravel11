@@ -1,6 +1,69 @@
 <?php
 
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Str;
+
+if (!function_exists('is_admin')) {
+
+    /**
+     * 检查当前请求是否是管理员面板的请求
+     *
+     * @return bool 如果是管理员面板的请求，返回true；否则返回false
+     */
+    function is_admin(): bool
+    {
+        // 获取管理员面板的名称
+        $adminName = panel_name();
+        // 获取当前请求的URI
+        $uri = request()->getRequestUri();
+        // 检查当前请求的URI是否以管理员面板的名称开头
+        if (Str::startsWith($uri, "/{$adminName}")) {
+            // 如果是管理员面板的请求，返回true
+            return true;
+        }
+
+        // 如果不是管理员面板的请求，返回false
+        return false;
+    }
+}
+
+if (!function_exists('panel_name')) {
+
+    /**
+     * 获取面板名称的函数。
+     *
+     * 该函数用于获取系统设置中的面板名称。如果系统设置中没有定义面板名称，
+     * 则返回默认值 'panel'。
+     *
+     * @return string 返回面板名称。
+     */
+    function panel_name(): string
+    {
+        // 调用 system_setting 函数获取面板名称，默认值为 'panel'
+        // 如果 system_setting 返回的值为 null 或 false，则使用三元运算符返回 'panel'
+        return system_setting('panel_name', 'panel') ?: 'panel';
+    }
+}
+
+if (!function_exists('current_admin')) {
+
+    /**
+     * 获取当前登录的管理员用户
+     *
+     * 该函数通过调用 Laravel 的认证系统中的 'admin' 守卫来获取当前登录的管理员用户。
+     * 'admin' 守卫是在 Laravel 应用中配置的，用于管理管理员用户的认证。
+     *
+     * @return Authenticatable|null 返回当前登录的管理员用户对象，如果没有管理员用户登录，则返回 null。
+     */
+    function current_admin(): ?Authenticatable
+    {
+        // 使用 Laravel 的 auth 助手函数，指定 'admin' 守卫来获取当前登录的用户
+        // auth('admin') 表示使用 'admin' 守卫进行认证
+        // user() 方法用于获取当前登录的用户对象
+        return auth('admin')->user();
+    }
+}
 
 if (!function_exists('fire_hook_action')) {
     /**
@@ -26,7 +89,7 @@ if (!function_exists('fire_hook_filter')) {
      * 触发一个过滤器钩子
      *
      * @param string $hookName
-     * @param mixed $data
+     * @param mixed  $data
      * @return mixed
      */
     function fire_hook_filter(string $hookName, mixed $data): mixed

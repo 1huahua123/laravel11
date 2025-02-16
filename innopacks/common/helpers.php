@@ -7,6 +7,38 @@ use Illuminate\Support\Facades\Schema;
 use InnoShop\Common\Repositories\LocaleRepo;
 use InnoShop\Common\Repositories\SettingRepo;
 
+if (!function_exists('locale_code')) {
+    /**
+     *  获取当前用户的语言环境代码
+     *
+     * 该函数首先检查当前用户是否是管理员，如果是管理员，则返回管理员偏好的语言环境代码。
+     * 如果管理员偏好的语言环境代码不在支持的语言环境列表中，或者当前用户不是管理员，
+     * 则从会话中获取语言环境代码，如果会话中没有则使用设置中的默认语言环境代码。
+     *
+     * @return string
+     * 返回当前用户的语言环境代码，可能为null
+     */
+    function locale_code(): string
+    {
+        // 获取应用程序配置中的默认语言环境代码
+        $configLocale = config('app.locale');
+        // 检查当前用户是否是管理员
+        if (is_admin()) {
+            // 获取当前管理员的偏好语言环境代码，如果不存在则使用配置中的默认语言环境代码
+            $locale = current_admin()->locale ?? $configLocale;
+            // 检查该语言环境代码是否存在于支持的语言环境列表中
+            if (locales()->contains('code', $locale)) {
+                // 如果存在，则返回该语言环境代码
+                return $locale;
+            }
+        }
+
+        // 如果不是管理员或者管理员的语言环境代码不在支持列表中
+        // 则从会话中获取语言环境代码，如果会话中没有则使用设置中的默认语言环境代码
+        return session('locale', setting_locale_code());
+    }
+}
+
 if (!function_exists('front_trans')) {
     /**
      * 前端翻译函数
