@@ -4,6 +4,56 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Str;
 
+if (!function_exists('plugin_locale_code')) {
+
+    /**
+     * 获取当前环境的区域设置代码。
+     *
+     * 根据当前用户是否在后台管理界面，返回不同的区域设置代码。
+     *
+     * @return string 当前环境的区域设置代码。
+     */
+    function plugin_locale_code(): string
+    {
+        // 检查当前用户是否在后台管理界面
+        if (is_admin()) {
+            // 如果是后台管理界面，调用 panel_locale_code() 函数获取区域设置代码
+            return panel_locale_code();
+        }
+
+        // 如果不是后台管理界面，调用 front_locale_code() 函数获取区域设置代码
+        return front_locale_code();
+    }
+}
+
+if (!function_exists('plugin_setting')) {
+
+    /**
+     * 获取插件设置值
+     *
+     * 该函数用于获取指定插件的设置值。如果提供了键名，则返回该键对应的设置值；
+     * 如果未提供键名，则返回整个插件的设置数组。
+     *
+     * @param string     $code    插件的代码标识
+     * @param string     $key     插件设置的键名，默认为空字符串
+     * @param mixed|null $default 如果指定键名不存在时返回的默认值，默认为 null
+     * @return mixed 返回指定键名的设置值或整个插件的设置数组
+     */
+    function plugin_setting(string $code, string $key = '', mixed $default = null): mixed
+    {
+        // 将插件代码标识转换为蛇形命名（例如：CamelCase 转换为 camel_case）
+        $code = Str::snake($code);
+        // 如果提供了键名
+        if ($key) {
+            // 返回该键对应的设置值，如果键不存在则返回默认值
+            return setting("$code.$key", $default);
+        }
+
+        // 如果未提供键名，则返回整个插件的设置数组
+        return setting("$code", $default);
+    }
+}
+
 if (!function_exists('is_admin')) {
 
     /**
