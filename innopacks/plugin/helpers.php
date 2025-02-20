@@ -3,6 +3,66 @@
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Str;
+use InnoShop\Common\Services\ImageService;
+use InnoShop\Plugin\Core\Plugin;
+
+if (!function_exists('plugin_resize')) {
+    /**
+     * 根据插件代码和图像路径调整图像大小
+     *
+     * @param string $pluginCode 插件的唯一代码标识
+     * @param string $image 图像路径
+     * @param int $width 目标宽度
+     * @param int $height 目标高度
+     * @return string 返回调整大小后的图像URL，如果图像路径以HTTP开头则直接返回原路径
+     */
+    function plugin_resize(string $pluginCode, string $image, int $width = 100, int $height = 100): string
+    {
+        // 检查图像路径是否以HTTP开头，如果是则直接返回图像路径
+        if (Str::startsWith($image, 'http')) {
+            return $image;
+        }
+
+        // 根据插件代码获取插件实例
+        $plugin = plugin($pluginCode);
+        // 获取插件目录名称
+        $pluginDirName = $plugin->getDirname();
+
+        // 使用ImageService实例调整图像大小并返回图像URL
+        return ImageService::getInstance($image)->setPluginDirName($pluginDirName)->resize($width, $height);
+    }
+
+}
+
+if (!function_exists('plugin')) {
+    /**
+     * 根据代码获取插件实例
+     *
+     * @param string $code 插件的唯一代码标识
+     * @return Plugin|null
+     */
+    function plugin(string $code): ?Plugin
+    {
+        return app('plugin')->getPlugin($code);
+    }
+}
+
+if (!function_exists('plugin_path')) {
+    /**
+     * 获取插件目录的完整路径
+     *
+     * @param string $path 可选的子路径，默认为空字符串
+     * @return string 返回插件目录的完整路径，如果提供了子路径，则返回包含子路径的完整路径
+     */
+    function plugin_path(string $path = ''): string
+    {
+        // 获取基础路径，即项目的根目录
+        // 然后拼接 'plugins' 目录
+        // 如果提供了子路径，则在 'plugins' 目录后添加子路径
+        // 使用 ltrim 去除子路径开头的斜杠，确保路径格式正确
+        return base_path('plugins').($path ? '/' . ltrim($path, '/') : $path);
+    }
+}
 
 if (!function_exists('plugin_locale_code')) {
 

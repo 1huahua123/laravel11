@@ -7,6 +7,53 @@ use Illuminate\Support\Facades\Schema;
 use InnoShop\Common\Repositories\LocaleRepo;
 use InnoShop\Common\Repositories\SettingRepo;
 
+if (!function_exists('create_directories')) {
+    /**
+     * 创建目录
+     *
+     * @param string $directoryPath 要创建的目录路径
+     * @return void
+     * @throws RuntimeException 如果目录创建失败则抛出异常
+     */
+    function create_directories(string $directoryPath): void
+    {
+        $ds = DIRECTORY_SEPARATOR;
+        $path = '';
+
+        // 将路径中的斜杠统一替换为系统默认的目录分隔符
+        $directoryPath = str_replace(['/', '\\'], $ds, $directoryPath);
+        // 如果路径以根目录开始，先添加根目录分隔符
+        if (substr($directoryPath, 0, 1) === $ds) {
+            $path = $ds;
+        }
+
+        // 将路径分割成单独的目录名
+        $directories = explode($ds, $directoryPath);
+        foreach ($directories as $directory) {
+            // 跳过空目录名
+            if ($directory === '') {
+                continue;
+            }
+
+            // 构建完整的目录路径
+            if ($path === '' || $path === $ds) {
+                $path .= $directory;
+            } else {
+                $path .= $ds . $directory;
+            }
+
+            // 如果目录不存在，则尝试创建
+            if (!is_dir($path)) {
+                if (!@mkdir($path, 0755, true) && !is_dir($path)) {
+                    // 如果创建目录失败，抛出异常
+                    throw new RuntimeException(sprintf('Directory "%s" was not created', $path));
+                }
+            }
+        }
+    }
+
+}
+
 if (!function_exists('locale_code')) {
     /**
      *  获取当前用户的语言环境代码
